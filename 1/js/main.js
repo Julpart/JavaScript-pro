@@ -1,20 +1,49 @@
+const API ='https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
+
+function getRequest(url) {
+
+    return new Promise(function(resolve, reject) {
+  
+      let xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+  
+      xhr.onload = function() {
+        if (this.status == 200) {
+          resolve(this.response);
+        } else {
+          let error = new Error(this.statusText);
+          error.code = this.status;
+          reject(error);
+        }
+      };
+  
+      xhr.onerror = function() {
+        reject(new Error("Network Error"));
+      };
+  
+      xhr.send();
+    });
+  
+  }
+
 class ProductList {
     constructor(container = '.products') {
         this.container = container;
         this.goods = [];
         this.allproducts = [];
 
-        this.fetchGoods();
-        this.render();
+        this.fetchGoods().then((data)=>{
+            this.goods = data;
+            this.render();
+
+        });
+        
     }
 
     fetchGoods() {
-        this.goods = [
-            { id: 1, title: 'Notebook', price: 1000, img: 'https://cspromogame.ru//storage/upload_images/avatars/897.jpg' },
-            { id: 2, title: 'Mouse', price: 20, img: 'https://cspromogame.ru//storage/upload_images/avatars/897.jpg' },
-            { id: 3, title: 'Keyboard', price: 200, img: 'https://cspromogame.ru//storage/upload_images/avatars/897.jpg' },
-            { id: 4, title: 'Gamepad', price: 50, img: 'https://cspromogame.ru//storage/upload_images/avatars/897.jpg' },
-        ];
+      return fetch(`${API}/catalogData.json`)
+      .then(response => response.json())
+      .catch((err) => console.log(err));
     }
 
     sumGoods(){
@@ -42,11 +71,12 @@ class ProductList {
 }
 
 class ProductItem {
-    constructor(product) {
+    constructor(product,img ='https://cspromogame.ru//storage/upload_images/avatars/897.jpg' ) {
         this.title = product.title;
         this.price = product.price;
         this.id = product.id;
-        this.img = product.img;
+        this.img = img;
+        
     }
 
     render() {
